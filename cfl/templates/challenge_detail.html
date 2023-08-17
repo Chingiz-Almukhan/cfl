@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% block content %}
+    <div class="nk-gap-2"></div>
+    <div class="container">
+        <ul class="nk-breadcrumbs">
+
+
+            <li><a href="{% url 'main' %}">Home</a></li>
+
+            <li>
+                <svg class="svg-inline--fa fa-angle-right fa-w-8" aria-hidden="true" data-prefix="fa"
+                     data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"
+                     data-fa-i2svg="">
+                    <path fill="currentColor"
+                          d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path>
+                </svg><!-- <span class="fa fa-angle-right"></span> --></li>
+
+            <li><span>Ladders</span></li>
+            {% if user.is_superuser %}
+{#                <a href="" data-toggle="modal" data-target="#modalCreateLadder">#}
+{#                    <span>Edit Challenge</span>#}
+{##}
+{#                </a>#}
+                {% if challenge.status == "dispute" %}
+                    <a href="" data-toggle="modal" data-target="#modalFixDispute">
+                        <span>View proofs</span>
+
+                    </a>
+                {% endif %}
+            {% endif %}
+            {% if challenge.result_first_team != 'won' and  challenge.result_first_team != 'loss' %}
+                {% for membership in challenge.first_team.participant_team.all %}
+                    {% if membership.user == request.user and membership.is_owner %}
+                        <a href="" data-toggle="modal" onclick="weekclick('id_result');"
+                           data-target="#modalReportResult">
+                            <span>Report result</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if challenge.result_second_team != 'won' and  challenge.result_second_team != 'loss' %}
+                {% for membership in challenge.second_team.participant_team.all %}
+                    {% if membership.user == request.user and membership.is_owner %}
+                        <a href="" data-toggle="modal" onclick="weekclick2('id_result');"
+                           data-target="#modalReportResult">
+                            <span>Report result</span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if challenge.status == "dispute" %}
+                {% if challenge.proof_first_team is not None %}
+                {% else %}
+                    {% for membership in challenge.first_team.participant_team.all %}
+                        {% if membership.user == request.user and membership.is_owner %}
+                            <a href="" data-toggle="modal" onclick="weekclick3('id_proof');"
+                               data-target="#modalReportProof">
+                                <span>Submit proof</span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if challenge.proof_second_team is not None %}
+                {% else %}
+                    {% for membership in challenge.second_team.participant_team.all %}
+                        {% if membership.user == request.user and membership.is_owner %}
+
+                            <a href="" data-toggle="modal" onclick="weekclick4('id_proof');"
+                               data-target="#modalReportProof">
+                                <span>Submit proof</span>
+                            </a>
+
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+
+
+        </ul>
+    </div>
+    <div class="nk-box-2 bg-dark-2">
+        <h4>Challenge id #{{ challenge.pk }}</h4>
+        <div class="nk-gap"></div>
+        <div class="col-lg-6">
+            <h4>Maps</h4>
+
+
+            <ol class="text-main-1 pl-20">
+                <li><strong class="text-white">{{ challenge.first_map.name }}</strong></li>
+                <li><strong class="text-white">{{ challenge.second_map.name }}</strong>
+                <li><strong class="text-white">{{ challenge.third_map.name }}</strong></li>
+
+            </ol>
+        </div>
+        <div class="nk-gap"></div>
+        <div class="col-lg-6">
+            <h4>Team 1</h4>
+
+
+            <ol class="text-main-1 pl-20">
+                {% for member in first_team %}
+                    <li><strong class="text-white">{{ member.user.psn }}</strong></li>
+                {% endfor %}
+
+            </ol>
+        </div>
+        <div class="nk-gap"></div>
+        <div class="col-lg-6">
+            <h4>Team 2</h4>
+            <ol class="text-main-1 pl-20">
+                {% for member in second_team %}
+                    <li><strong class="text-white">{{ member.user.psn }}</strong></li>
+                {% endfor %}
+
+            </ol>
+        </div>
+    </div>
+    <div class="nk-modal modal fade" id="modalCreateLadder" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+
+                    <h4 class="mb-0"><span class="text-main-1">Edit</span> Challenge</h4>
+
+
+                    <div class="nk-gap-1"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nk-modal modal fade mt-100" id="modalReportResult" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+
+                    <h4 class="mb-0"><span class="text-main-1">Report</span> Result</h4>
+                    <form action="{% url "report_challenge" challenge.pk %}" method="post">
+                        {% csrf_token %}
+                        <select name="test" class="form-select mt-10" title="" id="id_result">
+                            <option value="won">We Won</option>
+                            <option value="loss">We Lose</option>
+                        </select>
+                        <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                            Report
+                        </button>
+                    </form>
+                    <div class="nk-gap-1"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nk-modal modal fade mt-100" id="modalReportProof" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+                    <h4 class="mb-0"><span class="text-main-1">Report</span> Proof</h4>
+                    <form action="{% url "report_proof" challenge.pk %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3"><label class="form-label" for="id_proof">Enter link</label><input
+                                type="text" name="proof" placeholder="proof link" class="form-control"
+                                maxlength="100" minlength="5" title="" required="" id="id_proof"></div>
+                        <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                            Report
+                        </button>
+                    </form>
+                    <div class="nk-gap-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nk-modal modal fade mt-100" id="modalFixDispute" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+                    <h4 class="mb-0"><span class="text-main-1">Report</span> Proof</h4>
+                    <form action="{% url "fix_dispute" challenge.pk %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3"><label class="form-label">First Team proof</label>
+                            <p name="proof_first" class="form-control">
+                                {{ challenge.proof_first_team }}
+                            </p></div>
+                        <div class="mb-3"><label class="form-label">Second Team proof</label>
+                            <p name="proof_second" class="form-control">
+                                {{ challenge.proof_second_team }}
+                            </p></div>
+                        <div class="mb-3"><label class="form-label">Who won?</label>
+                            <select name="result" class="form-select mt-10" title="" id="id_result">
+                            <option value="first">First Team</option>
+                            <option value="second">Second Team</option>
+                        </select>
+                        </div>
+                        <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                            Report
+                        </button>
+                    </form>
+                    <div class="nk-gap-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nk-gap-2"></div>
+    <script type="text/javascript">
+        function weekclick(id) {
+            document.getElementById(id).setAttribute("name", "first_team");
+        }
+    </script>
+    <script type="text/javascript">
+        function weekclick2(id) {
+            document.getElementById(id).setAttribute("name", "second_team");
+        }
+    </script>
+    <script type="text/javascript">
+        function weekclick3(id) {
+            document.getElementById(id).setAttribute("name", "proof_first_team")
+        }
+    </script>
+    <script type="text/javascript">
+        function weekclick4(id) {
+            document.getElementById(id).setAttribute("name", "proof_second_team")
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load check_user_team %}
+{% block content %}
+    <div class="nk-gap-2"></div>
+    <div class="container">
+        <ul class="nk-breadcrumbs">
+
+
+            <li><a href="{% url 'ladders' %}">Ladders</a></li>
+
+
+            <li>
+                <svg class="svg-inline--fa fa-angle-right fa-w-8" aria-hidden="true" data-prefix="fa"
+                     data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"
+                     data-fa-i2svg="">
+                    <path fill="currentColor"
+                          d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path>
+                </svg><!-- <span class="fa fa-angle-right"></span> --></li>
+
+            <li><span>Team {{ team.name }}</span></li>
+
+
+        </ul>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="nk-team">
+            <div class="nk-team-logo">
+                <img src="{{ team.avatar.url }}" alt="">
+            </div>
+            <div class="nk-team-cont">
+                <h3 class="h5 mb-20"><span class="text-main-1">Team:</span> {{ team.name }}</h3>
+
+                <h4 class="h6 mb-10">{% if is_owner_or_captain %}
+                    <a href="" class="nk-btn nk-btn-rounded nk-btn-color-main-1"
+                       data-toggle="modal" data-target="#modalEditTeam">Edit</a>
+                    <a href="" class="nk-btn nk-btn-rounded nk-btn-color-main-1"
+                       data-toggle="modal" data-target="#modalInviteToTeam">Invite Members</a> <a href=""
+                                                                                                  class="nk-btn nk-btn-rounded nk-btn-color-main-1 ml-5"
+                                                                                                  data-toggle="modal"
+                                                                                                  data-target="#modalDisbandTeam">Disband</a>{% endif %}
+                    {% if user.is_authenticated %}
+                        {% for member in team.members.all %}
+                            {% if member.pk == user.pk %}
+                                <a
+                                        href=""
+                                        class="nk-btn nk-btn-rounded nk-btn-color-main-1 ml-2"
+                                        data-toggle="modal"
+                                        data-target="#modalLeaveFromTeam">Leave</a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                </h4>
+
+
+                <h4 class="h6 mb-5">Members:</h4>
+                {% for member in members %}
+
+                    <a href="{% url 'user_detail' member.user.pk %}">{{ member.user.psn }}</a>,
+
+
+                {% endfor %}
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="col-lg-12">
+        <div class="nk-gap"></div>
+        <!-- START: Accordion 1 -->
+        <h3 class="text-main-1">Matches</h3>
+        <div class="nk-gap"></div>
+        <div class="nk-accordion" id="accordion-1" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="accordion-1-1-heading">
+                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion-1" href="#accordion-1-1"
+                       aria-expanded="false" aria-controls="accordion-1-1">
+                        view
+                        <svg class="svg-inline--fa fa-angle-down fa-w-10 panel-heading-arrow" aria-hidden="true"
+                             data-prefix="fa" data-icon="angle-down" role="img" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 320 512" data-fa-i2svg="">
+                            <path fill="currentColor"
+                                  d="M143 352.3L7 216.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z"></path>
+                        </svg><!-- <span class="panel-heading-arrow fa fa-angle-down"></span> -->
+                    </a>
+                </div>
+                <div id="accordion-1-1" class="panel-collapse collapse" role="tabpanel"
+                     aria-labelledby="accordion-1-1-heading" style="">
+                    {% for challenge in challenges %}
+                        {% if team.pk == challenge.first_team.pk %}
+                            <div class="nk-match">
+                                <div class="nk-match-team-left">
+                                    <a href="{% url 'team_detail' challenge.first_team.pk %}">
+                        <span class="nk-match-team-logo">
+                            <img src="{{ challenge.first_team.avatar.url }}" alt="team-logo">
+                        </span>
+                                        <span class="nk-match-team-name">
+                            {{ challenge.first_team.name }}
+                        </span>
+                                    </a>
+                                </div>
+                                <div class="nk-match-status">
+                                    <a href="{% url "view_challenge" challenge.pk %}">
+                                        <span class="nk-match-status-vs">VS</span>
+                                        <span class="nk-match-score bg-dark-1">{{ challenge.status }}</span>
+                                    </a>
+                                </div>
+                                <div class="nk-match-team-right">
+                                    <a href="{% url 'team_detail' challenge.second_team.pk %}">
+                        <span class="nk-match-team-name">
+                            {{ challenge.second_team.name }}
+                        </span>
+                                        <span class="nk-match-team-logo">
+                            <img src="{{ challenge.second_team.avatar.url }}" alt="team-logo">
+                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="nk-match">
+                                <div class="nk-match-team-left">
+                                    <a href="{% url 'team_detail' challenge.second_team.pk %}">
+                        <span class="nk-match-team-logo">
+                            <img src="" alt="">
+                        </span>
+                                        <span class="nk-match-team-name">
+                            {{ challenge.second_team.name }}
+                        </span>
+                                    </a>
+                                </div>
+                                <div class="nk-match-status">
+                                    <a href="{% url "view_challenge" challenge.pk %}">
+                                        <span class="nk-match-status-vs">VS</span>
+                                        <span class="nk-match-score bg-dark-1">{{ challenge.status }}</span>
+                                    </a>
+                                </div>
+                                <div class="nk-match-team-right">
+                                    <a href="{% url 'team_detail' challenge.first_team.pk %}">
+                        <span class="nk-match-team-name">
+                            {{ challenge.first_team.name }}
+                        </span>
+                                        <span class="nk-match-team-logo">
+                            <img src="" alt="">
+                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+            </div>
+
+
+        </div>
+        <!-- END: Accordion 1 -->
+
+        <!-- START: Blockquote -->
+
+        <!-- END: Blockquote -->
+    </div>
+
+    </div>
+    <div class="nk-gap-2"></div>
+
+    <div class="nk-modal modal fade" id="modalEditTeam" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+
+                    <h4 class="mb-0"><span class="text-main-1">Edit</span> Team</h4>
+
+                    <div class="nk-gap-1"></div>
+                    <form action="" method="post" class="nk-form text-white">
+                        {% csrf_token %}
+
+                        <div class="row vertical-gap">
+                            <div class="col-md-12">
+                                {% bootstrap_form edit_team_form %}
+                                {% for member in team.members.all %}
+                                    <p> {{ member.username }} <a href="" data-toggle="modal"
+                                                                 data-target="#modalKick{{ member.pk }}">kick</a>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="nk-gap-1"></div>
+                        <div class="row vertical-gap">
+                            <div class="col-md-12">
+                                <input type="submit" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block"
+                                       value="Save">
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="nk-modal modal fade" id="modalInviteToTeam" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+
+                    <h4 class="mb-0"><span class="text-main-1">Invite</span> to Team</h4>
+
+                    <div class="nk-gap-1"></div>
+                    <form action="{% url "team_invite" team.pk %}" method="post" class="nk-form text-white">
+                        {% csrf_token %}
+
+                        <div class="row vertical-gap">
+                            <div class="col-md-12">
+                                {% bootstrap_form invite_form %}
+                            </div>
+                        </div>
+
+                        <div class="nk-gap-1"></div>
+                        <div class="row vertical-gap">
+                            <div class="col-md-12">
+                                <input type="submit" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block"
+                                       value="Invite">
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+        {% for member in team.members.all %}
+            <div class="nk-modal modal fade" id="modalKick{{ member.pk }}" tabindex="-1" role="dialog"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span class="ion-android-close"></span>
+                            </button>
+
+                            <h4 class="mb-0"><span class="text-main-1">Edit</span> Team</h4>
+
+                            <div class="nk-gap-1"></div>
+                            <form action="{% url "kick_from_the_team" member.pk %}" method="post"
+                                  class="nk-form text-white">
+                                {% csrf_token %}
+
+                                <div class="nk-gap-1"></div>
+                                <div class="row vertical-gap">
+                                    <div class="col-md-12">
+                                        <input type="submit"
+                                               class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block"
+                                               value="Are you sure?">
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="nk-modal modal fade" id="modalLeaveFromTeam" tabindex="-1" role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="ion-android-close"></span>
+                        </button>
+
+                        <h4 class="mb-0"><span class="text-main-1">Leave</span></h4>
+
+                        <div class="nk-gap-1"></div>
+                        <form action="{% url "leave" user.pk %}" method="post"
+                              class="nk-form text-white">
+                            {% csrf_token %}
+
+                            <div class="nk-gap-1"></div>
+                            <div class="row vertical-gap">
+                                <div class="col-md-12">
+                                    <input type="submit"
+                                           class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block"
+                                           value="Are you sure?">
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

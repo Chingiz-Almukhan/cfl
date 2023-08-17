@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load check_user_team %}
+{% block content %}
+    <div class="nk-gap-2"></div>
+    <div class="container">
+        <ul class="nk-breadcrumbs">
+
+
+            <li><a href="{% url 'ladders' %}">Ladders</a></li>
+
+
+            <li>
+                <svg class="svg-inline--fa fa-angle-right fa-w-8" aria-hidden="true" data-prefix="fa"
+                     data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"
+                     data-fa-i2svg="">
+                    <path fill="currentColor"
+                          d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path>
+                </svg><!-- <span class="fa fa-angle-right"></span> --></li>
+
+            <li><span>Ladder {{ ladder.name }}</span></li>
+
+        </ul>
+    </div>
+    <div class="col-lg-12">
+        <div class="nk-tabs">
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#tabs-1-1" role="tab" data-toggle="tab">Rules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tabs-1-2" role="tab" data-toggle="tab">More info</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tabs-1-3" role="tab" data-toggle="tab">Bla-bla</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade show active" id="tabs-1-1">
+                    <div class="nk-gap"></div>
+                    <p>{{ ladder.rules }}</p>
+                    <div class="nk-gap"></div>
+                    {% if user.is_authenticated %}
+                        {% if request.user|has_team_and_captain %}
+                            <form method="post" action="{% url 'create_challenge' ladder.pk %}">
+                                {% csrf_token %}
+                                <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">Post challenge</button>
+                                <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5" data-toggle='modal'
+                                   data-target="#modalAcceptChallenge">Accept challenge</a>
+                                <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5" data-toggle='modal'
+                                   data-target="#modalMyChallenges">My challenges</a>
+                            </form>
+                        {% elif request.user|has_team %}
+                        {% else %}
+                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5" data-toggle='modal'
+                               data-target="#modalJoin">Join</a>
+                        {% endif %}
+                    {% endif %}
+                    <div class="nk-gap"></div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tabs-1-2">
+                    <div class="nk-gap"></div>
+                    <p>And she went on planning to herself how she would manage it. 'They must go by the carrier' she
+                        thought; and how funny it'll seem And she went on planning to herself how</p>
+                    <div class="nk-gap"></div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tabs-1-3">
+                    <div class="nk-gap"></div>
+                    <p>I have related the substance of several conversations I had with my master during the greatest
+                        part
+                        of the time I had the, for brevity’s sake, omitted much moredown.</p>
+                    <div class="nk-gap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="nk-team">
+            <div class="nk-team-logo">
+                <img src="assets/images/team-1-lg.jpg" alt="">
+            </div>
+            <div class="nk-team-cont">
+                <h3 class="h5 mb-20"><span class="text-main-1">Team:</span> <a href="">Duke</a></h3>
+                <h4 class="h6 mb-5">Members:</h4>
+                <a href="">Duke</a>, <a href="">Bangi</a>, <a href="">Faker</a>,
+                <a href="">Bang</a>, <a href="">Wolf</a>
+            </div>
+        </div>
+        {% for team in teams %}
+            <div class="nk-team">
+                <div class="nk-team-logo">
+                    <img src="{{ team.avatar.url }}" alt="">
+                </div>
+                <div class="nk-team-cont">
+                    <h3 class="h5 mb-20"><span class="text-main-1">Team:</span> <a
+                            href="{% url 'team_detail' team.pk %}">{{ team.name }} </a></h3>
+                    <h5 class="h5 mb-2">points: {{ team.points }}</h5>
+                    <h4 class="h6 mb-5">Members:</h4>
+                    {% for member in team.members.all %}
+                        <a href="{% url "user_detail" member.pk %}">{{ member.psn }}</a>,
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+    <div class="nk-gap-2"></div>
+    <div class="nk-modal modal fade" id="modalJoin" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="ion-android-close"></span>
+                    </button>
+
+                    <h4 class="mb-0"><span class="text-main-1">Join</span></h4>
+
+                    <div class="nk-gap-1"></div>
+                    <form action="{% url 'create_team' ladder.pk %}" method="post" class="nk-form text-white">
+                        <div class="row vertical-gap">
+                            {% csrf_token %}
+                            {% bootstrap_form create_team_form %}
+                            <button type="submit">submit</button>
+                            <!--                        <div class="col-md-12">-->
+                            <!--                            Use email and password:-->
+
+                            <!--                            <div class="nk-gap"></div>-->
+                            <!--                            <input type="email" value="" name="email" class=" form-control" placeholder="Email">-->
+
+                            <!--                            <div class="nk-gap"></div>-->
+                            <!--                            <input type="password" value="" name="password" class="required form-control"-->
+                            <!--                                   placeholder="Password">-->
+                            <!--                        </div>-->
+                        </div>
+
+                        <div class="nk-gap-1"></div>
+                        <div class="row vertical-gap">
+                            <!--                        <div class="col-md-6">-->
+                            <!--                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block">Sign In</a>-->
+                            <!--                        </div>-->
+                            <!--                        <div class="col-md-6">-->
+                            <!--                            <div class="mnt-5">-->
+                            <!--                                <small><a href="#">Forgot your password?</a></small>-->
+                            <!--                            </div>-->
+                            <!--                            <div class="mnt-5">-->
+                            <!--                                <small><a href="#">Not a member? Sign up</a></small>-->
+                            <!--                            </div>-->
+                            <!--                        </div>-->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<div class="nk-modal modal fade" id="modalPostChallenge" tabindex="-1" role="dialog" aria-hidden="true">-->
+    <!--    <div class="modal-dialog modal-sm" role="document">-->
+    <!--        <div class="modal-content">-->
+    <!--            <div class="modal-body">-->
+    <!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+    <!--                    <span class="ion-android-close"></span>-->
+    <!--                </button>-->
+
+    <!--                <h4 class="mb-0"><span class="text-main-1">Post</span> Challenge</h4>-->
+
+    <!--                <div class="nk-gap-1"></div>-->
+    <!--                <form action="#" class="nk-form text-white">-->
+    <!--                    <div class="row vertical-gap">-->
+    <!--&lt;!&ndash;                        <div class="col-md-12">&ndash;&gt;-->
+    <!--&lt;!&ndash;                            Use email and password:&ndash;&gt;-->
+
+    <!--&lt;!&ndash;                            <div class="nk-gap"></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                            <input type="email" value="" name="email" class=" form-control" placeholder="Email">&ndash;&gt;-->
+
+    <!--&lt;!&ndash;                            <div class="nk-gap"></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                            <input type="password" value="" name="password" class="required form-control"&ndash;&gt;-->
+    <!--&lt;!&ndash;                                   placeholder="Password">&ndash;&gt;-->
+    <!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+    <!--                    </div>-->
+
+    <!--                    <div class="nk-gap-1"></div>-->
+    <!--                    <div class="row vertical-gap">-->
+    <!--&lt;!&ndash;                        <div class="col-md-6">&ndash;&gt;-->
+    <!--&lt;!&ndash;                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block">Sign In</a>&ndash;&gt;-->
+    <!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                        <div class="col-md-6">&ndash;&gt;-->
+    <!--&lt;!&ndash;                            <div class="mnt-5">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <small><a href="#">Forgot your password?</a></small>&ndash;&gt;-->
+    <!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                            <div class="mnt-5">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <small><a href="#">Not a member? Sign up</a></small>&ndash;&gt;-->
+    <!--&lt;!&ndash;                            </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+    <!--                    </div>-->
+    <!--                </form>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
+    {% if user.is_authenticated %}
+        {% if user|has_team_and_captain %}
+            <div class="nk-modal modal fade" id="modalAcceptChallenge" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span class="ion-android-close"></span>
+                            </button>
+
+                            <h4 class="mb-0"><span class="text-main-1">Accept</span> Challenge</h4>
+
+                            <div class="nk-gap-1"></div>
+                            <div class="col-lg-12">
+                                <!-- START: Table -->
+                                <div class="nk-gap"></div>
+                                <table class="nk-table">
+                                    <tbody>
+                                    <tr>
+                                        <th>Challenge id</th>
+                                        <th>Time</th>
+                                        <th class="text-center">Accept</th>
+                                    </tr>
+                                    {% if challenges %}
+                                        {% for challenge in challenges %}
+                                            <tr>
+                                                <td>{{ challenge.pk }}</td>
+                                                {% with timezone_name=user.timezone %}
+                                                    <td>{{ challenge.time_start|tz:timezone_name }}</td>
+                                                {% endwith %}
+                                                {% with challenge_id=challenge.pk %}
+                                                    {% if user|my_challenge:challenge_id %}
+                                                        <td class="text-center">
+                                                            <form method="post"
+                                                                  action="{% url 'cancel_challenge' challenge.pk %}">
+                                                                {% csrf_token %}
+                                                                <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                                                                    Cancel
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    {% else %}
+                                                        <td class="text-center">
+                                                            <form method="post"
+                                                                  action="{% url 'accept_challenge' challenge.pk %}">
+                                                                {% csrf_token %}
+                                                                <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                                                                    Accept
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    {% endif %}
+                                                {% endwith %}
+
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                <div class="nk-gap"></div>
+                                <!-- END: Table -->
+                            </div>
+                            <form action="#" class="nk-form text-white">
+                                <div class="row vertical-gap">
+                                    <!--                        <div class="col-md-12">-->
+                                    <!--                            Use email and password:-->
+
+                                    <!--                            <div class="nk-gap"></div>-->
+                                    <!--                            <input type="email" value="" name="email" class=" form-control" placeholder="Email">-->
+
+                                    <!--                            <div class="nk-gap"></div>-->
+                                    <!--                            <input type="password" value="" name="password" class="required form-control"-->
+                                    <!--                                   placeholder="Password">-->
+                                    <!--                        </div>-->
+                                </div>
+
+                                <div class="nk-gap-1"></div>
+                                <div class="row vertical-gap">
+                                    <!--                        <div class="col-md-6">-->
+                                    <!--                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block">Sign In</a>-->
+                                    <!--                        </div>-->
+                                    <!--                        <div class="col-md-6">-->
+                                    <!--                            <div class="mnt-5">-->
+                                    <!--                                <small><a href="#">Forgot your password?</a></small>-->
+                                    <!--                            </div>-->
+                                    <!--                            <div class="mnt-5">-->
+                                    <!--                                <small><a href="#">Not a member? Sign up</a></small>-->
+                                    <!--                            </div>-->
+                                    <!--                        </div>-->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nk-modal modal fade" id="modalMyChallenges" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span class="ion-android-close"></span>
+                            </button>
+
+                            <h4 class="mb-0"><span class="text-main-1">Active</span> Challenges</h4>
+
+                            <div class="nk-gap-1"></div>
+                            <div class="col-lg-12">
+                                <!-- START: Table -->
+                                <div class="nk-gap"></div>
+                                <table class="nk-table">
+                                    <tbody>
+                                    <tr>
+                                        <th>Challenge id</th>
+                                        <th>Time</th>
+                                        <th class="text-center">View</th>
+                                    </tr>
+                                    {% if active_challenges %}
+                                        {% for challenge in active_challenges %}
+                                            {% with challenge_id=challenge.pk %}
+                                                {% if user|our_challenge:challenge_id %}
+                                                    <tr>
+                                                        <td>{{ challenge.pk }}</td>
+                                                        {% if user.is_authenticated %}
+                                                            {% with timezone_name=user.timezone %}
+                                                                <td>{{ challenge.time_start|tz:timezone_name }} </td>
+                                                            {% endwith %}
+                                                        {% endif %}
+
+                                                        <td class="text-center">
+                                                            <form method="get"
+                                                                  action="{% url 'view_challenge' challenge.pk %}">
+
+                                                                <button class="nk-btn nk-btn-rounded nk-btn-color-main-1 mt-5">
+                                                                    View
+                                                                </button>
+                                                            </form>
+                                                        </td>
+
+
+                                                    </tr>
+                                                {% endif %}
+                                            {% endwith %}
+
+                                        {% endfor %}
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                                <div class="nk-gap"></div>
+                                <!-- END: Table -->
+                            </div>
+                            <form action="#" class="nk-form text-white">
+                                <div class="row vertical-gap">
+                                    <!--                        <div class="col-md-12">-->
+                                    <!--                            Use email and password:-->
+
+                                    <!--                            <div class="nk-gap"></div>-->
+                                    <!--                            <input type="email" value="" name="email" class=" form-control" placeholder="Email">-->
+
+                                    <!--                            <div class="nk-gap"></div>-->
+                                    <!--                            <input type="password" value="" name="password" class="required form-control"-->
+                                    <!--                                   placeholder="Password">-->
+                                    <!--                        </div>-->
+                                </div>
+
+                                <div class="nk-gap-1"></div>
+                                <div class="row vertical-gap">
+                                    <!--                        <div class="col-md-6">-->
+                                    <!--                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block">Sign In</a>-->
+                                    <!--                        </div>-->
+                                    <!--                        <div class="col-md-6">-->
+                                    <!--                            <div class="mnt-5">-->
+                                    <!--                                <small><a href="#">Forgot your password?</a></small>-->
+                                    <!--                            </div>-->
+                                    <!--                            <div class="mnt-5">-->
+                                    <!--                                <small><a href="#">Not a member? Sign up</a></small>-->
+                                    <!--                            </div>-->
+                                    <!--                        </div>-->
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

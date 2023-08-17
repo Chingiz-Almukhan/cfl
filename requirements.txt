@@ -1,0 +1,13 @@
+Django==4.1.7
+Pillow==9.4.0
+django-celery-beat==2.4.0
+django-bootstrap-v5==1.0.11
+django-xforwardedfor-middleware==2.0
+celery~=5.2.7
+pytz~=2023.3
+amqp~=5.1.1
+vine~=5.0.0
+kombu~=5.2.4
+billiard~=3.6.4.0
+python-crontab~=2.7.1
+django-timezone-field~=5.0

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Join team {{ membership.team.name }}</h1>
+
+<p>You have been invited to join the team {{ membership.team.name }} by {{ membership.team.membership_set.filter(is_owner=True).first().user.username }}.</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Join</button>
+</form>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% block content %}
+<div class="nk-gap-2"></div>
+<div class="container">
+    <ul class="nk-breadcrumbs">
+
+
+        <li><a href="{% url 'main' %}">Home</a></li>
+
+        <li>
+            <svg class="svg-inline--fa fa-angle-right fa-w-8" aria-hidden="true" data-prefix="fa"
+                 data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"
+                 data-fa-i2svg="">
+                <path fill="currentColor"
+                      d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path>
+            </svg><!-- <span class="fa fa-angle-right"></span> --></li>
+
+        <li><span>Ladders</span></li>
+        {% if user.is_superuser %}
+        <a href="" data-toggle="modal" data-target="#modalCreateLadder">
+                            <span>Create ladder</span>
+        </a>
+        {% endif %}
+
+    </ul>
+</div>
+<div class="col-lg-12">
+    <div class="nk-team">
+        <div class="nk-team-cont">
+            <h3 class="h5 mb-20"><span class="text-main-1">Ladder:</span> First ladder</h3>
+            <h4 class="h6 mb-5">Game: TLOU</h4>
+            <a href="">Detail view</a>
+
+
+        </div>
+    </div>
+    {% for ladder in ladders %}
+    <div class="nk-team">
+        <div class="nk-team-cont">
+            <h3 class="h5 mb-20"><span class="text-main-1">Ladder:</span> {{ ladder.name }}</h3>
+            <h4 class="h6 mb-5">Game: TLOU</h4>
+            <a href="{% url 'ladder_detail' ladder.pk %}">Detail view</a>
+
+
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+<div class="nk-modal modal fade" id="modalCreateLadder" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="ion-android-close"></span>
+                </button>
+
+                <h4 class="mb-0"><span class="text-main-1">Create</span> Ladder</h4>
+
+
+                <div class="nk-gap-1"></div>
+                <form action="{% url 'create_ladder' %}" method="post" class="nk-form text-white">
+                    <div class="row vertical-gap">
+                        {% csrf_token %}
+                        {% bootstrap_form ladder_form %}
+                        <button type="submit">submit</button>
+<!--                        <div class="col-md-12">-->
+<!--                            Use email and password:-->
+
+<!--                            <div class="nk-gap"></div>-->
+<!--                            <input type="email" value="" name="email" class=" form-control" placeholder="Email">-->
+
+<!--                            <div class="nk-gap"></div>-->
+<!--                            <input type="password" value="" name="password" class="required form-control"-->
+<!--                                   placeholder="Password">-->
+<!--                        </div>-->
+                    </div>
+
+                    <div class="nk-gap-1"></div>
+                    <div class="row vertical-gap">
+<!--                        <div class="col-md-6">-->
+<!--                            <a href="#" class="nk-btn nk-btn-rounded nk-btn-color-white nk-btn-block">Sign In</a>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <div class="mnt-5">-->
+<!--                                <small><a href="#">Forgot your password?</a></small>-->
+<!--                            </div>-->
+<!--                            <div class="mnt-5">-->
+<!--                                <small><a href="#">Not a member? Sign up</a></small>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="nk-gap-2"></div>
+{% endblock %}
